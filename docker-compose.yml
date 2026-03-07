@@ -1,0 +1,31 @@
+services:
+  app:
+    image: ai-content-api:dev
+    build:
+      context: .
+      target: dev
+    command: npm run start:dev
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://admin:admin123@mongo:27017/ai_content?authSource=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    volumes:
+      - ai-content-mongo:/data/db
+
+volumes:
+  ai-content-mongo:
