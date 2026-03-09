@@ -1,23 +1,39 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-
+import { HydratedDocument, Types } from "mongoose";
+import { Company } from "../../company/schemas/company.schema";
 export type AiContentDocument = HydratedDocument<AiContent>;
 
 export enum AiContentStatus {
-    Scheduled = "scheduled",
+    Draft = "draft",
+    Approved = "approved",
     Published = "published",
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class AiContent {
     @Prop({ required: true })
     caption: string;
 
     @Prop({ required: false })
-    imageBase64?: string;
+    imageS3Url?: string;
 
     @Prop({ required: false })
-    imageMimeType?: string;
+    imageS3Key?: string;
+
+    @Prop({ required: false })
+    prompt?: string;
+
+    @Prop({ required: false })
+    createdAt?: Date;
+
+    @Prop({ required: false })
+    updatedAt?: Date;
+
+    @Prop({ required: false })
+    approvedAt?: Date;
+
+    @Prop({ type: Types.ObjectId, ref: Company.name, required: true })
+    companyId: Types.ObjectId;
 
     @Prop({ type: String, enum: AiContentStatus, required: true })
     status: AiContentStatus;

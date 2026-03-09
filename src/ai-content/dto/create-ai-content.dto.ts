@@ -1,1 +1,3 @@
-export class CreateAiContentDto {}
+export class CreateAiContentDto {
+  prompt?: string;
+}

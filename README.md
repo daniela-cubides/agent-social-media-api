@@ -1,98 +1,149 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# AI Content Scheduler API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The goal of this application is to help marketing and publicity companies automatically generate, manage, and publish AI-generated social media content.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This is a NestJS + MongoDB (Mongoose) CRUD API that will later integrate with AI providers to generate and schedule content. It was bootstrapped with the Nest CLI using `nest new project-name`.
 
-## Description
+## Scope
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- CRUD for AI content items.
+- Storage in MongoDB via Mongoose.
+- Future integration with AI content generation and scheduling providers (TBD).
 
-## Project setup
+## Tech Stack
+
+- Node.js + TypeScript
+- NestJS
+- MongoDB
+- Mongoose
+
+## Project Structure
+
+- `src/` application source
+- `src/ai-content/` AI content feature module (controllers, services, schemas)
+- `src/ai-content/schemas/` Mongoose schemas
+
+## Getting Started
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+## Project Bootstrap Steps (What I Did)
 
 ```bash
-# development
-$ npm run start
+# Create the project
+nest new project-name
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Manually remove default example files and tests
+rm src/app.controller.ts
+rm src/app.controller.spec.ts
+rm src/app.service.ts
+rm src/ai-content/ai-content.controller.spec.ts
+rm src/ai-content/ai-content.service.spec.ts
+rm -rf src/ai-content/entities
+rm -rf test
 ```
 
-## Run tests
+### Generate AI Content Feature (Nest CLI)
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Generate a full CRUD resource (module + controller + service + DTOs)
+nest generate resource ai-content
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Development (Local Docker Compose)
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Tail the API logs:
 
-## Resources
+```bash
+docker compose logs -f app
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Production (Local)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm run build
+npm run start:prod
+```
 
-## Support
+## Environment
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Where to set the MongoDB connection string:
 
-## Stay in touch
+- If you run locally (not using Docker Compose): edit `.env` and set:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+MONGODB_URI=mongodb://localhost:27017/agent-social-media
+```
 
-## License
+- If you run with Docker Compose: the value is already set in `docker-compose.yml`
+  under the app service environment section. Update it there if needed.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Mastra + Gemini (Short Setup)
+
+1. Install deps:
+
+```bash
+npm install @mastra/core @ai-sdk/google
+```
+
+2. Add your Gemini key in `.env`:
+
+```bash
+GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+```
+
+3. Minimal usage (server-side):
+
+```ts
+import { Agent } from '@mastra/core/agent';
+import { google } from '@ai-sdk/google';
+
+const agent = new Agent({
+  id: 'caption-agent',
+  name: 'caption-agent',
+  instructions: 'Improve the caption and return only the final text.',
+  model: google('gemini-2.5-flash'),
+});
+```
+
+Use `agent.generateLegacy(...)` if you see the “AI SDK v4 model not compatible with generate()” error.
+
+## Local MongoDB With Docker (Compose)
+
+```bash
+# Start MongoDB locally
+docker compose up -d
+
+# Stop and remove containers
+docker compose down
+```
+
+## MongoDB Compass (Local)
+
+Use this connection string in Compass:
+
+```bash
+mongodb://admin:admin123@localhost:27017/agent-social-media?authSource=admin
+```
+
+## Deployment (Outline)
+
+1. Provision a MongoDB instance (Atlas or self-hosted).
+2. Set `MONGODB_URI` in the runtime environment.
+3. Build and run:
+
+```bash
+npm run build
+npm run start:prod
+```
+
+## Notes
+
+- AI provider integration is planned but not defined yet.
+- Scheduling behavior will be added after the base CRUD is stable.

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAiContentDto } from './dto/create-ai-content.dto';
 import { UpdateAiContentDto } from './dto/update-ai-content.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { AiContent, AiContentDocument } from './schemas/ai-content.schema';
+import { AiContent, AiContentDocument, AiContentStatus } from './schemas/ai-content.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -12,23 +12,32 @@ export class AiContentService {
     @InjectModel(AiContent.name) private readonly aiContentModel:Model<AiContentDocument> 
   ){}
 
-  create(createAiContentDto: CreateAiContentDto) {
-    return this.aiContentModel.create(createAiContentDto);
+  create(companyId: string, createAiContentDto: CreateAiContentDto) {
+    return this.aiContentModel.create({
+      companyId,
+      prompt: createAiContentDto.prompt,
+      caption: 'PENDING_AI',
+      status: AiContentStatus.Draft,
+    });
   }
 
-  findAll() {
-    return this.aiContentModel.find().exec();
+  findAll(companyId: string) {
+    return this.aiContentModel.find({ companyId }).exec();
   }
 
-  findOne(id: string) {
-    return this.aiContentModel.findById(id).exec();
+  findOne(companyId: string, id: string) {
+    return this.aiContentModel.findOne({ _id: id, companyId }).exec();
   }
 
-  update(id: string, updateAiContentDto: UpdateAiContentDto) {
-    return this.aiContentModel.findByIdAndUpdate(id, updateAiContentDto, { new: true });
+  update(companyId: string, id: string, updateAiContentDto: UpdateAiContentDto) {
+    return this.aiContentModel.findOneAndUpdate(
+      { _id: id, companyId },
+      updateAiContentDto,
+      { new: true },
+    );
   }
 
-  remove(id: string) {
-    return this.aiContentModel.findByIdAndDelete(id).exec();
+  remove(companyId: string, id: string) {
+    return this.aiContentModel.findOneAndDelete({ _id: id, companyId }).exec();
   }
 }

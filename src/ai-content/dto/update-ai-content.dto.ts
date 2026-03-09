@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateAiContentDto } from './create-ai-content.dto';
+import { AiContentStatus } from '../schemas/ai-content.schema';
 
-export class UpdateAiContentDto extends PartialType(CreateAiContentDto) {}
+export class UpdateAiContentDto {
+  caption?: string;
+  imageS3Url?: string;
+  imageS3Key?: string;
+  approvedAt?: Date;
+  status?: AiContentStatus;
+}
