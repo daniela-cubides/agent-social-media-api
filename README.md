@@ -25,6 +25,11 @@ This is a NestJS + MongoDB (Mongoose) CRUD API that will later integrate with AI
 
 ## Getting Started
 
+### Requirements
+
+- Node.js 18/20/22+ (Node 14 is not supported by current dependencies)
+- npm 8+ recommended
+
 ```bash
 npm install
 ```
@@ -84,12 +89,28 @@ MONGODB_URI=mongodb://localhost:27017/agent-social-media
 - If you run with Docker Compose: the value is already set in `docker-compose.yml`
   under the app service environment section. Update it there if needed.
 
+Recommended `.env` variables (minimum):
+
+```bash
+# Database
+MONGODB_URI=mongodb://admin:admin123@localhost:27017/agent-social-media?authSource=admin
+
+# Gemini / Google GenAI
+GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+
+# AWS S3
+S3_BUCKET_NAME=your-bucket
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+```
+
 ## Mastra + Gemini (Short Setup)
 
 1. Install deps:
 
 ```bash
-npm install @mastra/core @ai-sdk/google
+npm install @mastra/core @ai-sdk/google @google/genai @aws-sdk/client-s3
 ```
 
 2. Add your Gemini key in `.env`:
@@ -147,3 +168,4 @@ npm run start:prod
 
 - AI provider integration is planned but not defined yet.
 - Scheduling behavior will be added after the base CRUD is stable.
+- File uploads use Nest's built-in Multer integration via `@nestjs/platform-express` (no extra install required).

@@ -4,19 +4,27 @@ import { UpdateAiContentDto } from './dto/update-ai-content.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { AiContent, AiContentDocument, AiContentStatus } from './schemas/ai-content.schema';
 import { Model } from 'mongoose';
+import { AiContentGeneratorService } from './ai-content-generator.service';
 
 @Injectable()
 export class AiContentService {
-
   constructor(
-    @InjectModel(AiContent.name) private readonly aiContentModel:Model<AiContentDocument> 
-  ){}
+    @InjectModel(AiContent.name) private readonly aiContentModel: Model<AiContentDocument>,
+    private readonly generator: AiContentGeneratorService,
+  ) {}
 
-  create(companyId: string, createAiContentDto: CreateAiContentDto) {
+  async create(companyId: string, createAiContentDto: CreateAiContentDto) {
+    const { caption, imageS3Key, imageS3Url } = await this.generator.generate(
+      companyId,
+      createAiContentDto.prompt,
+    );
+
     return this.aiContentModel.create({
       companyId,
       prompt: createAiContentDto.prompt,
-      caption: 'PENDING_AI',
+      caption,
+      imageS3Key,
+      imageS3Url,
       status: AiContentStatus.Draft,
     });
   }
@@ -33,7 +41,7 @@ export class AiContentService {
     return this.aiContentModel.findOneAndUpdate(
       { _id: id, companyId },
       updateAiContentDto,
-      { new: true },
+      { returnDocument: 'after' },
     );
   }
 
