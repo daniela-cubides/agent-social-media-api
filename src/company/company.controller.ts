@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFiles, Query, BadRequestException } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Express } from 'express';
 import { memoryStorage } from 'multer';
 
 @Controller('company')
@@ -29,29 +28,87 @@ export class CompanyController {
     return this.companyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(id);
+  @Get(':companyId')
+  findOne(@Param('companyId') companyId: string) {
+    return this.companyService.findOne(companyId);
   }
 
-  @Patch(':id')
+  @Patch(':companyId')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'logos', maxCount: 10 }], {
       storage: memoryStorage(),
     }),
   )
   update(
-    @Param('id') id: string,
+    @Param('companyId') companyId: string,
     @Body() body: UpdateCompanyDto,
     @UploadedFiles() files?: { logos?: Express.Multer.File[] },
   ) {
     const updateCompanyDto = this.normalizeCompanyBody(body);
-    return this.companyService.update(id, updateCompanyDto, files);
+    return this.companyService.update(companyId, updateCompanyDto, files);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(id);
+  @Post(':companyId/logos')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'logos', maxCount: 10 }], {
+      storage: memoryStorage(),
+    }),
+  )
+  addLogos(
+    @Param('companyId') companyId: string,
+    @Body() body: { logosMeta?: any },
+    @UploadedFiles() files?: { logos?: Express.Multer.File[] },
+  ) {
+    const logosMeta = this.coerceArray(this.parseMaybeJson(body?.logosMeta));
+    return this.companyService.addLogos(companyId, files?.logos, logosMeta);
+  }
+
+  @Patch(':companyId/logos')
+  updateLogoType(
+    @Param('companyId') companyId: string,
+    @Body() body: { key?: string; type?: string | null },
+  ) {
+    if (!body?.key) {
+      throw new BadRequestException('key is required');
+    }
+    return this.companyService.updateLogoType(companyId, body.key, body.type);
+  }
+
+  @Patch(':companyId/logos/replace')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'logos', maxCount: 1 }], {
+      storage: memoryStorage(),
+    }),
+  )
+  replaceLogo(
+    @Param('companyId') companyId: string,
+    @Body() body: { key?: string; type?: string | null },
+    @UploadedFiles() files?: { logos?: Express.Multer.File[] },
+  ) {
+    if (!body?.key) {
+      throw new BadRequestException('key is required');
+    }
+    const file = files?.logos?.[0];
+    if (!file) {
+      throw new BadRequestException('logo file is required');
+    }
+    return this.companyService.replaceLogoFile(companyId, body.key, file, body.type);
+  }
+
+  @Delete(':companyId/logos')
+  removeLogo(
+    @Param('companyId') companyId: string,
+    @Query('key') key?: string,
+  ) {
+    if (!key) {
+      throw new BadRequestException('key is required');
+    }
+    return this.companyService.removeLogo(companyId, key);
+  }
+
+  @Delete(':companyId')
+  remove(@Param('companyId') companyId: string) {
+    return this.companyService.remove(companyId);
   }
 
   private normalizeCompanyBody(

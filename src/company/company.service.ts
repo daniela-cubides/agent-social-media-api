@@ -73,6 +73,88 @@ export class CompanyService {
     });
   }
 
+  async addLogos(
+    id: string,
+    files?: Express.Multer.File[],
+    logosMeta?: { type?: string }[],
+  ) {
+    const uploaded = await this.uploadLogos(id, files, logosMeta);
+    if (!uploaded?.length) {
+      return this.companyModel.findById(id).exec();
+    }
+
+    return this.companyModel.findByIdAndUpdate(
+      id,
+      { $push: { logos: { $each: uploaded } } },
+      { returnDocument: 'after' },
+    );
+  }
+
+  async updateLogoType(id: string, key: string, type?: string | null) {
+    if (type === undefined) {
+      return this.companyModel.findById(id).exec();
+    }
+
+    if (type === null || type === '') {
+      return this.companyModel.findOneAndUpdate(
+        { _id: id, 'logos.key': key },
+        { $unset: { 'logos.$.type': '' } },
+        { returnDocument: 'after' },
+      );
+    }
+
+    return this.companyModel.findOneAndUpdate(
+      { _id: id, 'logos.key': key },
+      { $set: { 'logos.$.type': type } },
+      { returnDocument: 'after' },
+    );
+  }
+
+  async replaceLogoFile(
+    id: string,
+    key: string,
+    file: Express.Multer.File,
+    type?: string | null,
+  ) {
+    const uploaded = await this.s3.uploadFile({
+      prefix: `companies/${id}`,
+      file,
+    });
+
+    const setOps: Record<string, any> = {
+      'logos.$.file': uploaded.url,
+      'logos.$.key': uploaded.key,
+    };
+    const unsetOps: Record<string, any> = {};
+
+    if (type !== undefined) {
+      if (type === null || type === '') {
+        unsetOps['logos.$.type'] = '';
+      } else {
+        setOps['logos.$.type'] = type;
+      }
+    }
+
+    const updateOperation: any = { $set: setOps };
+    if (Object.keys(unsetOps).length) {
+      updateOperation.$unset = unsetOps;
+    }
+
+    return this.companyModel.findOneAndUpdate(
+      { _id: id, 'logos.key': key },
+      updateOperation,
+      { returnDocument: 'after' },
+    );
+  }
+
+  async removeLogo(id: string, key: string) {
+    return this.companyModel.findByIdAndUpdate(
+      id,
+      { $pull: { logos: { key } } },
+      { returnDocument: 'after' },
+    );
+  }
+
   remove(id: string) {
     return this.companyModel.findByIdAndDelete(id).exec();
   }
